@@ -33,7 +33,11 @@ play(<VIDEO FILE PATH>)  # string or pathlib.Path
 * LEFT ARROW - decrease speed
 * r - reverse playback speed
 
+
+## Example view
+
 Frame number is seen in top of video. Cursor position and pixel intensities are seen in the window footer.
+![example view](https://github.com/daniel-falk/playerpy/blob/images/images/playerpy.png "Example view of window: Surveillance view credits to https://viratdata.org/")
 
 # How to subclass
 
@@ -41,7 +45,7 @@ todo
 
 # Todo
 
-[ ] Add footer showing total number of frames
-[ ] Better readme
-[ ] Upload release to pypi to make "pip installable"
-[ ] Parse requirements.txt from setup.py
+- [ ] Add footer showing total number of frames
+- [ ] Better readme
+- [ ] Upload release to pypi to make "pip installable"
+- [ ] Parse requirements.txt from setup.py
