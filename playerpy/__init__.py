@@ -5,6 +5,7 @@ from vi3o import Video
 from vi3o.debugview import DebugViewer
 from vi3o.utils import Frame
 from pyglet.window import key as keysym
+import numpy as np
 
 
 class NumberParser:
@@ -63,7 +64,7 @@ class Player(DebugViewer):
             frame = video[0]
         except (TypeError, KeyError):
             raise ValueError("Can't access frame 0 in video, is video a Video object?")
-        if not isinstance(frame, Frame):
+        if not isinstance(frame, (Frame, np.ndarray)):
             raise ValueError("First frame in video does not seem to be a vi3o Frame object.")
 
         self._video = video
