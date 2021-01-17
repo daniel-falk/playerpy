@@ -137,5 +137,9 @@ def play(path, start_frame=0):
     p.play()
 
 
-if __name__ == "__main__":
+def play_cmd():
     play(sys.argv[1])
+
+
+if __name__ == "__main__":
+    play_cmd()

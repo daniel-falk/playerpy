@@ -35,4 +35,7 @@ projects, e.g. data annotation tools.
     license='MIT',
     cmdclass={'test': PyTestCommand},
     tests_require=['pytest'],
+    entry_points = {
+        'console_scripts': ['playerpy=playerpy:play_cmd'],
+    }
 )
