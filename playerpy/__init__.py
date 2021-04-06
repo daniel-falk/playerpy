@@ -7,6 +7,8 @@ from vi3o.utils import Frame
 from pyglet.window import key as keysym
 import numpy as np
 
+from playerpy.version import __version__
+
 
 class NumberParser:
     """Parse a number from key-presses
@@ -139,6 +141,9 @@ def play(path, start_frame=0):
 
 
 def play_cmd():
+    if sys.argv[1] == "--version":
+        print("Playerpy version: %s" % __version__)
+        return
     play(sys.argv[1])
 
 
