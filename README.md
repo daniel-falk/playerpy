@@ -32,6 +32,7 @@ play(<VIDEO FILE PATH>)  # string or pathlib.Path
 * RIGHT ARROW - increase speed
 * LEFT ARROW - decrease speed
 * r - reverse playback speed
+* s - save current frame to disk as JPG
 
 
 ## Example view

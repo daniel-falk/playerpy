@@ -4,6 +4,7 @@ import sys
 from vi3o import Video
 from vi3o.debugview import DebugViewer
 from vi3o.utils import Frame
+from vi3o.image import imsave
 from pyglet.window import key as keysym
 import numpy as np
 
@@ -112,6 +113,8 @@ class Player(DebugViewer):
             self._paused = not self._paused
         elif key == keysym.ENTER:
             self._index += 1
+        elif key == keysym.S:
+            self._dump_frame()  # Save current frame to disk
         else:
             return super().on_key_press(key, modifiers)
         DebugViewer.step_counter += 1
@@ -131,6 +134,14 @@ class Player(DebugViewer):
         while True:
             self._index = (self._index + self._update) % len(self._video)
             yield self._video[self._index]
+
+    def _dump_frame(self):
+        frame = self._video[self._index]
+        imsave(frame, "playerpy_frame_%s_%d.jpg" % (
+                hash(str(self._video.filename)),
+                self._index
+            )
+        )
 
 
 def play(path, start_frame=0):
