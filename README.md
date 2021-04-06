@@ -59,4 +59,4 @@ todo
 
 - [ ] Add footer showing total number of frames
 - [ ] Better readme
-- [ x ] Upload release to pypi to make "pip installable"
+- [x] Upload release to pypi to make "pip installable"
