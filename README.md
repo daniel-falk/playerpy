@@ -49,4 +49,3 @@ todo
 - [ ] Add footer showing total number of frames
 - [ ] Better readme
 - [ ] Upload release to pypi to make "pip installable"
-- [ ] Parse requirements.txt from setup.py

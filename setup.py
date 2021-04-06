@@ -35,6 +35,14 @@ projects, e.g. data annotation tools.
     license='MIT',
     cmdclass={'test': PyTestCommand},
     tests_require=['pytest'],
+    install_requires=[
+        "vi3o",
+        "pyglet",
+        "pathlib",
+        "pillow",
+        "imageio",
+        "imageio-ffmpeg",
+    ],
     entry_points = {
         'console_scripts': ['playerpy=playerpy:play_cmd'],
     }
