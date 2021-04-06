@@ -1,15 +1,26 @@
 # playerpy - Simple and extendable video player using python
 
-A simple video player with quick key-bindings for play, reverse,
-single frame step forward and backwards, goto frame number etc.
-Class is easily extendible for other projects, e.g. data annotation
+A simple video player for Linux with quick key-bindings for play, reverse,
+single frame step forward and backwards, goto frame number, save frame etc.
+The player class is easily extendible for other projects, e.g. data annotation
 tools.
 
 # How to install
+You can install playerpy directly from pypi with pip:
+```bash
+pip install playerpy
+```
+
+Thats it! You can also clone the git repo and install from source:
+
 ```bash
 git clone https://github.com/daniel-falk/playerpy.git
-pip install -r playerpy/requirements.txt
-pip install playerpy
+pip install playerpy/
+```
+
+If you get into dependency problems, make sure you have the following installed:
+```bash
+sudo apt-get install libjpeg62-turbo-dev libavcodec-dev libswscale-dev libffi-dev
 ```
 
 # How to use
@@ -48,4 +59,4 @@ todo
 
 - [ ] Add footer showing total number of frames
 - [ ] Better readme
-- [ ] Upload release to pypi to make "pip installable"
+- [ x ] Upload release to pypi to make "pip installable"
