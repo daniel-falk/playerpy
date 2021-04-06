@@ -115,6 +115,7 @@ class Player(DebugViewer):
             self._index += 1
         elif key == keysym.S:
             self._dump_frame()  # Save current frame to disk
+            self._index -= self._update  # Iterator will step once
         else:
             return super().on_key_press(key, modifiers)
         DebugViewer.step_counter += 1
