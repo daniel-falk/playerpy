@@ -41,14 +41,7 @@
 
   //add event listener for key press
   document.addEventListener('keyup', (e) => {
-    if (e.code === "ArrowLeft") {
-      console.log("left")
-      doSend("ARROW_LEFT")
-    }
-    else if (e.code === "ArrowRight") {
-      doSend("ARROW_RIGHT")
-    }
-
+    doSend("EVENT(key)="+e.code)
   });
 
   //Funtion to initiailize html elements 
@@ -58,7 +51,7 @@
     document.myform.disconnectButton.disabled = true;
   }
 
-  //Function to make connection to Web-Socket 
+  //Function to make connection to Web-Socket server
   function doConnect() {
     websocket = new WebSocket(document.myform.url.value);
     websocket.onopen = function (evt) { onOpen(evt) };
@@ -68,7 +61,7 @@
   }
 
 
-  //Function called when connection established with Web-Socket successfully
+  //Function called when connection established with Web-Socket server successfully
   function onOpen(evt) {
     writeToScreen("connected\n");
     document.myform.connectButton.disabled = true;
@@ -76,20 +69,20 @@
   }
 
 
-  //Function called when connection is disconnected with Web-Socket successfully
+  //Function called when connection is disconnected with Web-Socket server successfully
   function onClose(evt) {
     writeToScreen("disconnected\n");
     document.myform.connectButton.disabled = false;
     document.myform.disconnectButton.disabled = true;
   }
 
-  //Function called when Web-Socket send response successfully
+  //Function called when Web-Socket server send response successfully
   function onMessage(evt) {
     writeToScreen("response: IMG=" + evt.data + '\n');
     document.myform.image.src = evt.data;
   }
 
-  //Function called when Web-Socket sends ERROR message successfully
+  //Function called when Web-Socket server sends ERROR message
   function onError(evt) {
     writeToScreen('error: ' + evt.data + '\n');
     websocket.close();
@@ -98,7 +91,7 @@
 
   }
 
-  //Function called when send request to Web-Socket
+  //Function called when send request to Web-Socket server
   function doSend(message) {
     writeToScreen("sent: " + message + '\n');
     websocket.send(message);
@@ -121,13 +114,13 @@
     document.myform.outputtext.value = "";
   }
 
-  //Function called to disconnect with Web-Sockets
+  //Function called to disconnect with Web-Sockets server
   function doDisconnect() {
     websocket.close();
   }
 
-  //Function to find image position on page
-  function findImagePosition(img) {
+  //Function to get image position on page
+  function getImagePosition(img) {
     if (typeof (img.offsetParent) != "undefined") {
       for (var x = 0, y = 0; img; img = img.offsetParent) {
         x += img.offsetLeft;
@@ -140,25 +133,38 @@
     }
   }
 
-  //Function to get normalize coordinates of image
-  function GetImageCoordinates(evt) {
+  //Function to get normalized coordinates of image
+  function getImageClickCoordinates(evt) {
     var x = 0;
     var y = 0;
     var imgPos;
-    imgPos = findImagePosition(img);
+    imgPos = getImagePosition(img);
+
+    /**
+    * Get MouseEvent from window's object if evt is null due to browser incompatibility
+    * Some browsers do not support MouseEvent as an argument
+    */
     if (!evt) var evt = window.event;
+
+    /**To get coordinate(pageX,PageY) in pixels, at which the mouse was clicked, 
+     * relative to the to left edge of the whole rendered page.
+     */
     if (evt.pageX || evt.pageY) {
       x = evt.pageX;
       y = evt.pageY;
     }
+    /**To get coordinate(clientX, clientY) in pixels, at which the mouse was clicked,
+     *  relative to the to left edge of the visible part of the page.
+     */
     else if (evt.clientX || evt.clientY) {
-      x = e.clientX + document.body.scrollLeft
+      x = evt.clientX + document.body.scrollLeft
         + document.documentElement.scrollLeft;
-      y = e.clientY + document.body.scrollTop
+      y = evt.clientY + document.body.scrollTop
         + document.documentElement.scrollTop;
     }
 
     x -= imgPos[0];
+    //Ignoring horizontal borders of image
     if (x < 0) {
       x = 0;
     }
@@ -168,6 +174,7 @@
     x /= img.width;
 
     y -= imgPos[1]
+    //Ignoring vertical border of image
     if (y < 0) {
       y = 0;
     }
@@ -175,8 +182,15 @@
       y = img.height
     }
     y /= img.height;
-    doSend("COORDINATES(x,y)=(" + x + "," + y+")")
+    return {x, y};
   }
+
+  //Function to send normalized coordinates of image to Web-Socket server
+  function sendImageClickCoordinates(evt) {
+    var coordinates = getImageClickCoordinates(evt);
+    doSend("COORDINATES(x,y)=(" + coordinates.x + "," + coordinates.y+")")
+  }
+
 
 </script>
 
@@ -204,7 +218,7 @@
   //Getting reference of image
   var img = document.getElementById("image");
   //Attaching mouse event to image
-  img.onmousedown = GetImageCoordinates;
+  img.onmousedown = sendImageClickCoordinates;
 </script>
 
 </html>

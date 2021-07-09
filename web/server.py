@@ -1,7 +1,6 @@
 from simple_websocket_server import WebSocketServer, WebSocket
 import threading
 import time
-import re
 
 #Images path
 IMAGES = [
@@ -29,12 +28,14 @@ class SimpleImageSource(WebSocket):
         Receive an event from the front-end and act on it
         """
         print("Event: %s" % self.data)
-        if self.data == "ARROW_LEFT":
-            self.idx -= 1
-        elif self.data == "ARROW_RIGHT":
-            self.idx += 1
+        if self.data.split('=')[0] == "EVENT(key)":
+            if self.data.split('=')[1] == "ArrowLeft":
+                self.idx -= 1
+            elif self.data.split('=')[1] == "ArrowRight":
+                self.idx += 1
+            else:
+                return
         elif self.data.split('=')[0] == "COORDINATES(x,y)":
-            print(self.data)
             return
         else:
             print("Unknown event: %s" % str(self.data))
@@ -50,7 +51,7 @@ class SimpleImageSource(WebSocket):
 
     def handle_close(self):
         """
-        Display closed address and send image path
+        Display closed address
         """
         print(self.address, 'closed')
 
