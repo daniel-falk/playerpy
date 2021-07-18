@@ -4,107 +4,221 @@
 
 <title>WebSocket Test</title>
 
+<style>
+  * {
+    box-sizing: border-box;
+  }
+
+  /* Create two equal columns that floats next to each other */
+  .column {
+    float: left;
+    width: 50%;
+    padding: 1%;
+  }
+
+  /* Clear floats after the columns */
+  .row:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+
+
+  #image {
+    max-height: 100%;
+    max-width: 48%;
+    position: absolute;
+    border: 1px solid black;
+
+  }
+</style>
+
+
 <script language="javascript" type="text/javascript">
 
+  //add event listener for page load
+  window.addEventListener("load", init, false);
 
-  function init()
-  {
-	document.myform.url.value = "ws://localhost:8000/"
-	document.myform.inputtext.value = "Hello World!"
-	document.myform.disconnectButton.disabled = true;
+  //add event listener for key press
+  document.addEventListener('keyup', (e) => {
+    doSend("EVENT(key)="+e.code)
+  });
+
+  //Funtion to initiailize html elements 
+  function init() {
+    document.myform.url.value = "ws://localhost:8000/"
+    document.myform.inputtext.value = "Hello World!"
+    document.myform.disconnectButton.disabled = true;
   }
 
-  function doConnect()
-  {
+  //Function to make connection to Web-Socket server
+  function doConnect() {
     websocket = new WebSocket(document.myform.url.value);
-    websocket.onopen = function(evt) { onOpen(evt) };
-    websocket.onclose = function(evt) { onClose(evt) };
-    websocket.onmessage = function(evt) { onMessage(evt) };
-    websocket.onerror = function(evt) { onError(evt) };
+    websocket.onopen = function (evt) { onOpen(evt) };
+    websocket.onclose = function (evt) { onClose(evt) };
+    websocket.onmessage = function (evt) { onMessage(evt) };
+    websocket.onerror = function (evt) { onError(evt) };
   }
 
-  function onOpen(evt)
-  {
+
+  //Function called when connection established with Web-Socket server successfully
+  function onOpen(evt) {
     writeToScreen("connected\n");
-	document.myform.connectButton.disabled = true;
-	document.myform.disconnectButton.disabled = false;
+    document.myform.connectButton.disabled = true;
+    document.myform.disconnectButton.disabled = false;
   }
 
-  function onClose(evt)
-  {
+
+  //Function called when connection is disconnected with Web-Socket server successfully
+  function onClose(evt) {
     writeToScreen("disconnected\n");
-	document.myform.connectButton.disabled = false;
-	document.myform.disconnectButton.disabled = true;
+    document.myform.connectButton.disabled = false;
+    document.myform.disconnectButton.disabled = true;
   }
 
-  function onMessage(evt)
-  {
-    writeToScreen("response: " + evt.data + '\n');
+  //Function called when Web-Socket server send response successfully
+  function onMessage(evt) {
+    writeToScreen("response: IMG=" + evt.data + '\n');
+    document.myform.image.src = evt.data;
   }
 
-  function onError(evt)
-  {
+  //Function called when Web-Socket server sends ERROR message
+  function onError(evt) {
     writeToScreen('error: ' + evt.data + '\n');
-
-	websocket.close();
-
-	document.myform.connectButton.disabled = false;
-	document.myform.disconnectButton.disabled = true;
+    websocket.close();
+    document.myform.connectButton.disabled = false;
+    document.myform.disconnectButton.disabled = true;
 
   }
 
-  function doSend(message)
-  {
-    writeToScreen("sent: " + message + '\n'); 
+  //Function called when send request to Web-Socket server
+  function doSend(message) {
+    writeToScreen("sent: " + message + '\n');
     websocket.send(message);
   }
 
-  function writeToScreen(message)
-  {
+  //Function called to display message on screen
+  function writeToScreen(message) {
     document.myform.outputtext.value += message
-	document.myform.outputtext.scrollTop = document.myform.outputtext.scrollHeight;
-
+    document.myform.outputtext.scrollTop = document.myform.outputtext.scrollHeight;
   }
 
-  window.addEventListener("load", init, false);
 
+  //Wrapper function for doSend()
+  function sendText() {
+    doSend(document.myform.inputtext.value);
+  }
 
-   function sendText() {
-		doSend( document.myform.inputtext.value );
-   }
-
+  //Function called to clear output text
   function clearText() {
-		document.myform.outputtext.value = "";
-   }
+    document.myform.outputtext.value = "";
+  }
 
-   function doDisconnect() {
-		websocket.close();
-   }
+  //Function called to disconnect with Web-Sockets server
+  function doDisconnect() {
+    websocket.close();
+  }
+
+  //Function to get image position on page
+  function getImagePosition(img) {
+    if (typeof (img.offsetParent) != "undefined") {
+      for (var x = 0, y = 0; img; img = img.offsetParent) {
+        x += img.offsetLeft;
+        y += img.offsetTop;
+      }
+      return [x, y];
+    }
+    else {
+      return [img.x, img.y];
+    }
+  }
+
+  //Function to get normalized coordinates of image
+  function getImageClickCoordinates(evt) {
+    var x = 0;
+    var y = 0;
+    var imgPos;
+    imgPos = getImagePosition(img);
+
+    /**
+    * Get MouseEvent from window's object if evt is null due to browser incompatibility
+    * Some browsers do not support MouseEvent as an argument
+    */
+    if (!evt) var evt = window.event;
+
+    /**To get coordinate(pageX,PageY) in pixels, at which the mouse was clicked, 
+     * relative to the to left edge of the whole rendered page.
+     */
+    if (evt.pageX || evt.pageY) {
+      x = evt.pageX;
+      y = evt.pageY;
+    }
+    /**To get coordinate(clientX, clientY) in pixels, at which the mouse was clicked,
+     *  relative to the to left edge of the visible part of the page.
+     */
+    else if (evt.clientX || evt.clientY) {
+      x = evt.clientX + document.body.scrollLeft
+        + document.documentElement.scrollLeft;
+      y = evt.clientY + document.body.scrollTop
+        + document.documentElement.scrollTop;
+    }
+
+    x -= imgPos[0];
+    //Ignoring horizontal borders of image
+    if (x < 0) {
+      x = 0;
+    }
+    else if (x > img.width) {
+      x = img.width
+    }
+    x /= img.width;
+
+    y -= imgPos[1]
+    //Ignoring vertical border of image
+    if (y < 0) {
+      y = 0;
+    }
+    else if (y > img.height) {
+      y = img.height
+    }
+    y /= img.height;
+    return {x, y};
+  }
+
+  //Function to send normalized coordinates of image to Web-Socket server
+  function sendImageClickCoordinates(evt) {
+    var coordinates = getImageClickCoordinates(evt);
+    doSend("COORDINATES(x,y)=(" + coordinates.x + "," + coordinates.y+")")
+  }
 
 
 </script>
 
+
 <div id="output"></div>
-
 <form name="myform">
-<p>
-<textarea name="outputtext" rows="20" cols="50"></textarea>
-</p>
-<p>
-<textarea name="inputtext" cols="50"></textarea>
-</p>
-<p>
-<textarea name="url" cols="50"></textarea>
-</p>
-<p>
-<input type="button" name=sendButton value="Send" onClick="sendText();">
-<input type="button" name=clearButton value="Clear" onClick="clearText();">
-<input type="button" name=disconnectButton value="Disconnect" onClick="doDisconnect();">
-<input type="button" name=connectButton value="Connect" onClick="doConnect();">
-</p>
-
-
+  <div class="row">
+    <div class="column">
+      <img id="image" name="image" class="image" alt="">
+    </div>
+    <div class="column">
+      <textarea name="outputtext" rows="20" cols="50"></textarea>
+      <textarea name="inputtext" cols="50"></textarea>
+      <textarea name="url" cols="50"></textarea>
+      <br>
+      <input type="button" name=sendButton value="Send" onClick="sendText();">
+      <input type="button" name=clearButton value="Clear" onClick="clearText();">
+      <input type="button" name=disconnectButton value="Disconnect" onClick="doDisconnect();">
+      <input type="button" name=connectButton value="Connect" onClick="doConnect();">
+      </p>
+    </div>
+  </div>
 </form>
-</html> 
+<script>
+  //Getting reference of image
+  var img = document.getElementById("image");
+  //Attaching mouse event to image
+  img.onmousedown = sendImageClickCoordinates;
+</script>
 
-
+</html>
