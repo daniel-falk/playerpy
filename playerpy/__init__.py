@@ -88,10 +88,20 @@ class Player(DebugViewer):
     def len(self):
         return self._len
 
-    def _inc_fcnt(self):
-        """Override parent method to show current frame number as window title
+    def _dispatch_events(self):
+        """Override dispatch_events in DebugViewer to overwrite window name
+
+        ...since this is called after DebugViewer sets the window name but before
+        the window is rendered. This shows correct frame index and frame time.
         """
-        self.fcnt = self._index
+        idx = self._index
+        frame = self._video[idx]
+        real_time = frame.systime
+        rel_time = frame.timestamp
+        frame_info = "%d - %f - %f" % (idx, real_time, rel_time)
+        text = "{} - {} - speed: {}".format(self.name, frame_info, self._update)
+        self.window.set_caption(text)
+        super()._dispatch_events()
 
     def on_key_press(self, key, modifiers):
         """Override parent method for key press in window
