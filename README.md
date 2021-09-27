@@ -49,7 +49,7 @@ play(<VIDEO FILE PATH>)  # string or pathlib.Path
 ## Example view
 
 Frame number is seen in top of video. Cursor position and pixel intensities are seen in the window footer.
-![example view](https://github.com/daniel-falk/playerpy/blob/images/images/playerpy.png "Example view of window: Surveillance view credits to https://viratdata.org/")
+![example view](https://github.com/daniel-falk/playerpy/blob/images/images/playerpy-virat.png "Example view of window: Surveillance view credits to https://viratdata.org/")
 
 # How to subclass
 
