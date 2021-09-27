@@ -62,7 +62,7 @@ class NumberParser:
 
 
 class Player(DebugViewer):
-    def __init__(self, video, **args):
+    def __init__(self, video, replay=True, **args):
         try:
             frame = video[0]
         except (TypeError, KeyError):
@@ -70,6 +70,7 @@ class Player(DebugViewer):
         if not isinstance(frame, (Frame, np.ndarray)):
             raise ValueError("First frame in video does not seem to be a vi3o Frame object.")
 
+        self._replay = replay
         self._video = video
         self._index = 0
         self._update = 1
@@ -142,9 +143,18 @@ class Player(DebugViewer):
             self._update += inc
 
     def _iterate(self):
-        while True:
-            self._index = (self._index + self._update) % len(self._video)
-            yield self._video[self._index]
+        def next_index():
+            next_idx = self._index + self._update
+            if not self._replay:
+                return next_idx
+            return next_idx % len(self._video)
+
+        try:
+            while True:
+                self._index = next_index()
+                yield self._video[self._index]
+        except IndexError:
+            pass
 
     def _dump_frame(self):
         frame = self._video[self._index]
@@ -155,9 +165,9 @@ class Player(DebugViewer):
         )
 
 
-def play(path, start_frame=0):
+def play(path, start_frame=0, replay=True):
     video = Video(path)
-    p = Player(video)
+    p = Player(video, replay=replay)
     p.move(start_frame)
     p.play()
 
