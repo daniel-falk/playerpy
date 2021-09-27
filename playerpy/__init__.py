@@ -96,8 +96,8 @@ class Player(DebugViewer):
         """
         idx = self._index
         frame = self._video[idx]
-        real_time = frame.systime
-        rel_time = frame.timestamp
+        real_time = frame.systime if hasattr(frame, "systime") else float("nan")
+        rel_time = frame.timestamp if hasattr(frame, "timestamp") else float("nan")
         frame_info = "%d - %f - %f" % (idx, real_time, rel_time)
         text = "{} - {} - speed: {}".format(self.name, frame_info, self._update)
         self.window.set_caption(text)
